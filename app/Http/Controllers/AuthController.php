@@ -6,77 +6,59 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     // Register user
-    public function register(Request $request)
+        public function register(Request $request)
     {
-        // Validate input
         $request->validate([
-            'username' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:6|confirmed', // requires password_confirmation
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
-        // Create user
         $user = User::create([
-            'name' => $request->username, // store username in 'name' field
+            'name' => $request->name, // matches input field
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        // Create token
-        $token = $user->createToken('auth_token')->plainTextToken;
+        auth()->login($user); // optional: log user in immediately
 
-        // Return response
-        return response()->json([
-            'message' => 'User registered successfully',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user
-        ], 201);
+        return redirect('/dashboard')->with('status', 'Registered successfully!');
     }
 
     // Login user
-    public function login(Request $request)
+        public function login(Request $request)
     {
         // Validate input
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
 
-        // Find user by email
-        $user = User::where('email', $request->email)->first();
-
-        // Check password
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+        // Attempt to log in
+        if (auth()->attempt($credentials)) {
+            $request->session()->regenerate(); // Prevent session fixation
+            return redirect()->intended('dashboard')->with('status', 'Logged in successfully!');
         }
 
-        // Create token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        // Return response
-        return response()->json([
-            'message' => 'User logged in successfully',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user
-        ], 200);
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
+
 
     // Logout user
     public function logout(Request $request)
     {
-        // Revoke current access token
-        $request->user()->currentAccessToken()->delete();
+        Auth::logout(); // logs out the user from session
 
-        return response()->json([
-            'message' => 'User logged out successfully'
-        ]);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/'); // redirect to home page
     }
 }

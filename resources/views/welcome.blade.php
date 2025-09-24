@@ -13,7 +13,7 @@
     <!-- Full-width Banner -->
     <div class="w-full">
         <img 
-            src="{{ asset('img/dashboard-banner-2.jpg') }}" 
+            src="{{ asset('img/home-banner-2.jpg') }}" 
             alt="Dashboard Banner" 
             class="w-full h-auto object-cover">
     </div>
@@ -144,7 +144,7 @@
 </section>
 
 
-
+@include('layouts.footer')
 
 <!-- Scripts -->
 <script>
