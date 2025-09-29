@@ -1,24 +1,34 @@
-<x-app-layout>
-    <div class="min-h-screen flex flex-col bg-[#ffe8e9]">
+{{-- resources/views/components/categories/acne.blade.php --}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acne Products</title>
+    @vite('resources/css/app.css') {{-- Tailwind CSS --}}
+</head>
+<body class="bg-[#ffe8e9]">
+
+    {{-- Navigation --}}
+    @include('navigation-menu')
+
+    <div class="min-h-screen flex flex-col">
 
         {{-- Banner --}}
         <div class="w-full">
             <img 
                 src="{{ asset('img/acne-banner.jpeg') }}" 
                 alt="Acne Banner" 
-                class="w-full h-[498px] object-cover">
+                class="w-full h-[500px] object-cover">
         </div>
 
         {{-- Search / Filter --}}
         <section class="max-w-7xl mx-auto px-6 py-6">
-            <form method="GET" action="{{ route('categories.acne') }}" class="flex flex-wrap gap-4 justify-center">
-
-                {{-- Search Bar --}}
+            <form method="GET" action="{{ route('user.shop.acne') }}" class="flex flex-wrap gap-4 justify-center">
                 <input type="text" name="search" placeholder="Search acne products..." 
-                    value="{{ request('search') }}"
-                    class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 w-full sm:w-[500px] lg:w-[600px]">
+                       value="{{ request('search') }}"
+                       class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 w-full sm:w-[500px] lg:w-[600px]">
 
-                {{-- Filter Button --}}
                 <button type="submit" 
                         class="px-4 py-2 bg-[#db9289] text-white font-semibold rounded-lg hover:bg-[#c87b7c] transition">
                     Search
@@ -28,10 +38,11 @@
 
         {{-- Product Grid (Acne only) --}}
         <section class="max-w-7xl mx-auto px-6 py-12 flex-1">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                 @forelse($products as $product)
                     <a href="{{ route('product.details', $product->id) }}" 
-                       class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4 cursor-pointer block">
+                       class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4 cursor-pointer"
+                         style="min-width: 320px; max-width: 400px;">
                         <img src="{{ asset('uploads/products/'.$product->image) }}" 
                              alt="{{ $product->name }}" 
                              class="w-full h-56 object-cover rounded-xl">
@@ -51,4 +62,6 @@
         @include('layouts.footer')
 
     </div>
-</x-app-layout>
+
+</body>
+</html>

@@ -11,7 +11,7 @@ class OrderItemController extends Controller
      */
     public function index()
     {
-        return response()->json(OrderIteam::with(['order', 'product'])->get());
+        return response()->json(OrderItem::with(['order', 'product'])->get());
     }
 
     /**
@@ -19,8 +19,8 @@ class OrderItemController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validated([
-            'order_id' => 'required|exists:orders,id',
+        $validated = $request->validate([
+            'order_id'   => 'required|exists:orders,id',
             'product_id' => 'required|exists:products,id',
             'quantity'   => 'required|integer|min:1',
             'price'      => 'required|numeric',
@@ -29,8 +29,8 @@ class OrderItemController extends Controller
         $orderItem = OrderItem::create($validated);
 
         return response()->json($orderItem, 201);
-
     }
+
 
     /**
      * Display the specified resource.

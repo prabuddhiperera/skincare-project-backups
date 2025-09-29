@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -10,7 +11,7 @@ class AdminLoginController extends Controller
 {
     public function showLoginForm()
     {
-        return view('auth.admin-login');
+        return view('auth.admin-login'); // make sure view exists
     }
 
     public function login(Request $request)
@@ -20,8 +21,11 @@ class AdminLoginController extends Controller
             'password' => 'required|min:6',
         ]);
 
-        if (Auth::guard('admin')->attempt($request->only('email', 'password'), $request->filled('remember'))) {
-            return redirect()->intended('admin.dashboard');
+        if (Auth::guard('admin')->attempt(
+            $request->only('email', 'password'),
+            $request->filled('remember')
+        )) {
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         return back()->withErrors([
@@ -32,6 +36,6 @@ class AdminLoginController extends Controller
     public function logout()
     {
         Auth::guard('admin')->logout();
-        return redirect()->route('admin.login');
+        return redirect()->route('admin.login.form');
     }
 }

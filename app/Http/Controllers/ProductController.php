@@ -2,48 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;                
+use App\Models\Product;
+use App\Models\Category;                
 use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of products.
      */
     public function index()
     {
-        return ProductResource::collection(Product::all());
+        $products = Product::with('category')->get(); // eager load category
+        return view('admin.products.index', compact('products'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Show the form for creating a new product.
+     */
+    public function create()
+    {
+        $categories = Category::all(); // fetch all categories for dropdown
+        return view('admin.products.create-product', compact('categories'));
+    }
+
+    /**
+     * Store a newly created product.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'brand' => 'nullable|string|max:255',
             'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
         ]);
 
-        $product = Product::create($validated);
-        return new ProductResource($product);
+        Product::create($validated);
+
+        return redirect()->route('admin.products.index')->with('success', 'Product added successfully!');
     }
 
     /**
-     * Display the specified resource.
+     * Show a single product (API resource example).
      */
-    public function show(string $id)
+    public function show($id)
     {
         $product = Product::findOrFail($id);
-        return new ProductResource($product);
+        $reviews = $product->reviews; // assuming a relationship
+        return view('components.product-details', compact('product', 'reviews'));
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * Update a product.
      */
     public function update(Request $request, string $id)
     {
@@ -51,25 +64,25 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
+            'brand' => 'nullable|string|max:255',
             'price' => 'sometimes|required|numeric|min:0',
-            'stock' => 'sometimes|required|integer|min:0',
             'category_id' => 'sometimes|required|exists:categories,id',
         ]);
 
         $product->update($validated);
+
         return new ProductResource($product);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete a product.
      */
     public function destroy(string $id)
     {
         $product = Product::findOrFail($id);
         $product->delete();
-        return response()->json(['message' => 'Product deleted successfully']);
 
+        return response()->json(['message' => 'Product deleted successfully']);
     }
 
     public function popular()

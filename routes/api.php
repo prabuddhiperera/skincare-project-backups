@@ -9,25 +9,27 @@ use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AdminController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// ----------------------
+// Authenticated User Info
+// ----------------------
+Route::get('/user', fn(Request $request) => $request->user())
+    ->middleware('auth:sanctum');
 
-// Public authentication routes
+// ----------------------
+// Public Authentication
+// ----------------------
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Routes requiring authentication
+// ----------------------
+// Routes Requiring Auth
+// ----------------------
 Route::middleware('auth:sanctum')->group(function () {
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    // Get authenticated user
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
 
     // Products (CRUD)
     Route::apiResource('products', ProductController::class);
@@ -38,12 +40,41 @@ Route::middleware('auth:sanctum')->group(function () {
     // Orders (customers create, admins manage)
     Route::apiResource('orders', OrderController::class);
 
-    // Order Items
+    // Order Items (CRUD)
     Route::apiResource('order-items', OrderItemController::class);
 
-    // Reviews
+    // Reviews (CRUD)
     Route::apiResource('reviews', ReviewController::class);
 
-    // Payments (admin only for update, destroy)
+    // Payments (admin only should manage update/destroy)
     Route::apiResource('payments', PaymentController::class);
+});
+
+
+// ----------------------
+// Admin (Customers CRUD API)
+// ----------------------
+Route::prefix('admin')->group(function () {
+    Route::get('/customers', [AdminController::class, 'apiCustomers']);
+    Route::post('/customers', [AdminController::class, 'storeCustomer']);
+    Route::get('/customers/{id}', [AdminController::class, 'apiShowCustomer']);
+    Route::put('/customers/{id}', [AdminController::class, 'updateCustomer']);
+    Route::delete('/customers/{id}', [AdminController::class, 'deleteCustomer']);
+});
+
+Route::prefix('orders')->group(function () {
+    Route::get('/', [OrderController::class, 'apiIndex']);
+    Route::get('/{order}', [OrderController::class, 'apiShow']);
+    Route::post('/', [OrderController::class, 'apiStore']);
+    Route::put('/{order}', [OrderController::class, 'apiUpdate']);
+    Route::delete('/{order}', [OrderController::class, 'apiDestroy']);
+});
+
+//PRODUCTS
+Route::prefix('admin')->group(function () {
+    Route::get('products', [ProductController::class, 'index']);       // List all products
+    Route::get('products/{id}', [ProductController::class, 'show']);   // Show a single product
+    Route::post('products', [ProductController::class, 'store']);      // Create a product
+    Route::put('products/{id}', [ProductController::class, 'update']); // Update a product
+    Route::delete('products/{id}', [ProductController::class, 'destroy']); // Delete a product
 });

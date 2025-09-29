@@ -2,68 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\User;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display orders list.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Order::with(['customer', 'orderItems', 'payment'])->get());
+        $status = $request->query('status');
+
+        $orders = Order::with(['customer', 'orderItems.product'])
+            ->when($status, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin.orders.index', compact('orders', 'status'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'totalamount' => 'required|numeric',
-            'orderdate'   => 'required|date',
-            'status'      => 'required|string',
-        ]);
 
-        $order = Order::create($validated);
+public function edit($id)
+{
+    $order = Order::with('orderItems.product')->findOrFail($id);
+    $customers = USER::all();
+    $products = Product::all();
 
-        return response()->json($order, 201);
+    return view('admin.orders.edit', compact('order', 'customers', 'products'));
+}
+
+
+public function update(Request $request, $id)
+{
+    $order = Order::findOrFail($id);
+
+    $order->update([
+        'user_id' => $request->user_id,
+        'orderdate'   => $request->orderdate,
+        'status'      => $request->status,
+    ]);
+
+    // Replace items
+    $order->orderItems()->delete();
+
+    if ($request->has('items')) {
+        foreach ($request->items as $item) {
+            $order->orderItems()->create($item);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $order = Order::with(['customer', 'orderItems', 'payment'])->findOrFail($id);
-        return response()->json($order);
-    }
+    return redirect()->route('admin.orders')->with('success', 'Order updated successfully.');
+}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $order = Order::findOrFail($id);
+public function destroy($id)
+{
+    $order = Order::findOrFail($id);
 
-        $validated = $request->validate([
-            'totalamount' => 'sometimes|numeric',
-            'orderdate'   => 'sometimes|date',
-            'status'      => 'sometimes|string',
-        ]);
+    // Delete associated order items first
+    $order->orderItems()->delete();
 
-        $order->update($validated);
+    // Delete the order
+    $order->delete();
 
-        return response()->json($order);
-    }
+    return redirect()->route('admin.orders')->with('success', 'Order deleted successfully.');
+}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        Order::findOrFail($id)->delete();
-        return response()->json(null, 204);
-    }
+
+
 }

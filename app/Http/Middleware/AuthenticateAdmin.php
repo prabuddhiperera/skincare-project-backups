@@ -6,17 +6,13 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class RedirectIfAdminAuthenticated
+class AuthenticateAdmin
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::guard('admin')->check()) {
-            return redirect()->route('admin.dashboard');
+        if (!Auth::guard('admin')->check()) {
+            return redirect()->route('admin.login.form')->with('error', 'Unauthorized.');
         }
-
         return $next($request);
     }
 }

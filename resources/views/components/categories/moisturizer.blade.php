@@ -1,4 +1,17 @@
-<x-app-layout>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moisturizer Products</title>
+    @vite('resources/css/app.css') {{-- Tailwind CSS --}}
+</head>
+<body class="bg-[#ffe8e9]">
+
+    {{-- Navigation --}}
+    @include('navigation-menu')
+
+
     <div class="min-h-screen flex flex-col bg-[#ffe8e9]">
 
         {{-- Banner --}}
@@ -11,7 +24,7 @@
 
         {{-- Search / Filter --}}
         <section class="max-w-7xl mx-auto px-6 py-6">
-            <form method="GET" action="{{ route('categories.moisturizer') }}" class="flex flex-wrap gap-4 justify-center">
+            <form method="GET" action="{{ route('user.shop.moisturizer') }}" class="flex flex-wrap gap-4 justify-center">
 
                 {{-- Search Bar --}}
                 <input type="text" name="search" placeholder="Search moisturizer products..." 
@@ -28,10 +41,11 @@
 
         {{-- Product Grid (Moisturizer only) --}}
         <section class="max-w-7xl mx-auto px-6 py-12 flex-1">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                 @forelse($products as $product)
                     <a href="{{ route('product.details', $product->id) }}" 
-                       class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4 cursor-pointer block">
+                       class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4 cursor-pointer"
+                         style="min-width: 320px; max-width: 400px;">
                         <img src="{{ asset('uploads/products/'.$product->image) }}" 
                              alt="{{ $product->name }}" 
                              class="w-full h-56 object-cover rounded-xl">
@@ -51,4 +65,6 @@
         @include('layouts.footer')
 
     </div>
-</x-app-layout>
+
+</body>
+</html>

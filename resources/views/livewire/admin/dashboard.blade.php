@@ -17,9 +17,9 @@
             </div>
             <nav class="flex-1 p-4 space-y-4">
                 <a href="{{ route('admin.dashboard') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Dashboard</a>
-                <a href="{{ route('admin.customers') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Users</a>
-                <a href="{{ route('admin.orders') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Orders</a>
-                <a href="{{ route('admin.products.index') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Products</a>
+                <a href="#" class="block py-2 px-4 rounded hover:bg-gray-700">Users</a>
+                <a href="#" class="block py-2 px-4 rounded hover:bg-gray-700">Orders</a>
+                <a href="#" class="block py-2 px-4 rounded hover:bg-gray-700">Products</a>
                 <a href="#" class="block py-2 px-4 rounded hover:bg-gray-700">Categories</a>
             </nav>
             <form method="POST" action="{{ route('admin.logout') }}" class="p-4 border-t border-gray-700">
