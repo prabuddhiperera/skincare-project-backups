@@ -88,5 +88,49 @@
 
     </div>
 
+    {{-- Floating Toast Container --}}
+    <div id="toast-container" class="fixed top-5 right-5 space-y-2 z-50"></div>
+
+    <script>
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `
+                px-4 py-3 rounded shadow-lg text-white
+                ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}
+                animate-slideIn
+            `;
+            toast.textContent = message;
+
+            document.getElementById('toast-container').appendChild(toast);
+
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            @if(session('success'))
+                showToast("{{ session('success') }}", 'success');
+            @endif
+
+            @if(session('error'))
+                showToast("{{ session('error') }}", 'error');
+            @endif
+        });
+    </script>
+
+    <style>
+        /* Simple slide-in animation */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slideIn {
+            animation: slideIn 0.5s ease forwards;
+        }
+    </style>
+
 </body>
 </html>

@@ -54,6 +54,13 @@ class ProductController extends Controller
         return view('components.product-details', compact('product', 'reviews'));
     }
 
+    public function edit($id)
+    {
+        $product = Product::findOrFail($id);
+        $categories = Category::all();
+
+        return view('admin.products.edit-product', compact('product', 'categories'));
+    }
 
     /**
      * Update a product.
@@ -63,16 +70,17 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
+            'name' => 'required|string|max:255',
             'brand' => 'nullable|string|max:255',
-            'price' => 'sometimes|required|numeric|min:0',
-            'category_id' => 'sometimes|required|exists:categories,id',
+            'price' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
         ]);
 
         $product->update($validated);
 
-        return new ProductResource($product);
+        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
     }
+
 
     /**
      * Delete a product.
@@ -82,8 +90,10 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->delete();
 
-        return response()->json(['message' => 'Product deleted successfully']);
+        return redirect()->route('admin.products.index')
+                        ->with('success', 'Product deleted successfully!');
     }
+
 
     public function popular()
     {

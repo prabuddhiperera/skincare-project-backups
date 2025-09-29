@@ -17,4 +17,10 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    // Mutator (always save name lowercase)
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = strtolower($value);
+    }
 }

@@ -17,16 +17,14 @@ class OrderController extends Controller
     {
         $status = $request->query('status');
 
-        $orders = Order::with(['customer', 'orderItems.product'])
-            ->when($status, function ($query, $status) {
-                $query->where('status', $status);
-            })
+        // Use scopeStatus + eager loading
+        $orders = Order::with(['user', 'products'])
+            ->status($status)
             ->orderBy('created_at', 'desc')
             ->get();
 
         return view('admin.orders.index', compact('orders', 'status'));
     }
-
 
 public function edit($id)
 {
@@ -37,28 +35,44 @@ public function edit($id)
     return view('admin.orders.edit', compact('order', 'customers', 'products'));
 }
 
+// Show single order details
+    public function show($id)
+    {
+        $order = \App\Models\Order::with(['user', 'products'])->findOrFail($id);
 
-public function update(Request $request, $id)
-{
-    $order = Order::findOrFail($id);
-
-    $order->update([
-        'user_id' => $request->user_id,
-        'orderdate'   => $request->orderdate,
-        'status'      => $request->status,
-    ]);
-
-    // Replace items
-    $order->orderItems()->delete();
-
-    if ($request->has('items')) {
-        foreach ($request->items as $item) {
-            $order->orderItems()->create($item);
-        }
+        return view('admin.orders.show', compact('order'));
     }
 
-    return redirect()->route('admin.orders')->with('success', 'Order updated successfully.');
-}
+
+
+// Update order
+    public function update(Request $request, Order $order)
+    {
+        // Validate
+        $validated = $request->validate([
+            'customer_id' => 'required|exists:users,id',
+            'status'      => 'required|in:pending,completed,delivered,cancelled',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity'   => 'required|integer|min:1',
+        ]);
+
+        // Update order
+        $order->update([
+            'user_id' => $validated['customer_id'],
+            'status'  => $validated['status'],
+        ]);
+
+        // Update products
+        $syncData = [];
+        foreach ($request->items as $item) {
+            $syncData[$item['product_id']] = [
+                'quantity' => $item['quantity']
+            ];
+        }
+        $order->products()->sync($syncData);
+
+        return redirect()->route('admin.orders.index')->with('success', 'Order updated successfully.');
+    }
 
 public function destroy($id)
 {

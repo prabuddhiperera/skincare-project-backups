@@ -39,6 +39,18 @@ class Product extends Model
                     ->withTimestamps();
     }
 
+    // Query Scope (active products)
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    // Accessor (formatted price)
+    public function getFormattedPriceAttribute()
+    {
+        return 'Rs. ' . number_format($this->price, 2);
+    }
+
     // Customers who purchased this product (via order_items → orders)
     public function customers()
     {
@@ -58,4 +70,5 @@ class Product extends Model
     {
         return $this->belongsTo(Admin::class);
     }
+
 }

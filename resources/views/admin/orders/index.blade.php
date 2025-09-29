@@ -29,10 +29,7 @@
     <!-- Main Content -->
     <main class="flex-1 p-6 overflow-auto">
 
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">Orders</h1>
-        </div>
+        <h1 class="text-3xl font-bold mb-6">Orders</h1>
 
         <!-- Status Filters -->
         <div class="flex gap-2 mb-4">
@@ -59,19 +56,9 @@
                     @forelse($orders as $order)
                         <tr class="hover:bg-gray-50">
                             <td class="border px-4 py-2">{{ $order->id }}</td>
-                            <td class="border px-4 py-2">{{ $order->customer->name ?? 'N/A' }}</td>
-                            <td class="border px-4 py-2">${{ number_format($order->totalamount, 2) }}</td>
-                            <td class="border px-4 py-2">
-                                @if($order->status == 'pending')
-                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">Pending</span>
-                                @elseif($order->status == 'delivered')
-                                    <span class="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Delivered</span>
-                                @elseif($order->status == 'completed')
-                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">Completed</span>
-                                @else
-                                    <span class="px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full">Cancelled</span>
-                                @endif
-                            </td>
+                            <td class="border px-4 py-2">{{ $order->user->name ?? 'N/A' }}</td>
+                            <td class="border px-4 py-2">{{ $order->formatted_total }}</td>
+                            <td class="border px-4 py-2">{{ $order->status_label }}</td>
                             <td class="border px-4 py-2">{{ $order->created_at->format('d M Y') }}</td>
                             <td class="border px-4 py-2 flex gap-2">
                                 <a href="{{ route('admin.orders.show', $order->id) }}" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">View</a>

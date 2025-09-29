@@ -10,15 +10,15 @@ class Order extends Model
 
     protected $fillable = 
     [
-        'customer_id',
+        'user_id',
         'totalamount',
         'orderdate',
         'status',
         
     ];
 
-    public function customer() {
-        return $this->belongsto(User::class);
+    public function user() {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function orderItems() {
@@ -40,4 +40,43 @@ class Order extends Model
     {
         return $this->belongsTo(Admin::class);
     }
+
+    /**
+     * Scopes
+     */
+    public function scopeStatus($query, $status)
+    {
+        if ($status) {
+            return $query->where('status', $status);
+        }
+        return $query;
+    }
+
+    /**
+     * Accessors
+     */
+    public function getFormattedTotalAttribute()
+    {
+        return 'Rs. ' . number_format($this->totalamount, 2);
+    }
+
+    public function getStatusLabelAttribute()
+    {
+        return match ($this->status) {
+            'pending'   => '🟡 Pending',
+            'completed' => '🔵 Completed',
+            'delivered' => '🟢 Delivered',
+            'cancelled' => '🔴 Cancelled',
+            default     => '⚪ Unknown',
+        };
+    }
+
+    /**
+     * Casts
+     */
+    protected $casts = [
+        'orderdate' => 'datetime:d M Y',
+        'totalamount' => 'decimal:2',
+    ];
+
 }
