@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orders</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite('resources/css/app.css') {{-- Tailwind --}}
 </head>
 <body class="bg-gray-100 font-sans">
 
@@ -18,7 +18,7 @@
             <a href="{{ route('admin.customers') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Users</a>
             <a href="{{ route('admin.orders') }}" class="block py-2 px-4 bg-gray-700 rounded">Orders</a>
             <a href="{{ route('admin.products.index') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Products</a>
-            <a href="#" class="block py-2 px-4 rounded hover:bg-gray-700">Categories</a>
+            <a href="{{ route('admin.reviews.index') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Reviews</a>
         </nav>
         <form method="POST" action="{{ route('admin.logout') }}" class="p-4 border-t border-gray-700">
             @csrf

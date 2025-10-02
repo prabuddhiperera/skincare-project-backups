@@ -66,7 +66,7 @@ class DatabaseSeeder extends Seeder
 
         //create order, oderitems and payments 
         $orders = Order::factory(10)->create([
-            'customer_id' => $users->random()->id,
+            'user_id' => $users->random()->id,
         ]);
 
         foreach ($orders as $order) {
@@ -92,7 +92,7 @@ class DatabaseSeeder extends Seeder
             $reviewCount = rand(1, 5);
             for ($i = 0; $i < $reviewCount; $i++) {
                 Review::factory()->create([
-                    'customer_id' => $users->random()->id,
+                    'user_id' => $users->random()->id,
                     'product_id' => $product->id,
                 ]);
             }

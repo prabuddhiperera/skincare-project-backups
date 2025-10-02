@@ -86,28 +86,31 @@ class AdminController extends Controller
 
     // ================== AUTH METHODS ==================
 
-    // Show login form
     public function showLoginForm()
     {
-        return view('auth.admin-login');
+        return view('auth.admin-login'); // blade file
     }
-
-    // Handle login
+ 
     public function login(Request $request)
     {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required|min:6',
-        ]);
+        $credentials = $request->only('email', 'password');
 
-        if (Auth::guard('admin')->attempt($request->only('email', 'password'))) {
+        if (Auth::guard('admin')->attempt($credentials, $request->filled('remember'))) {
             return redirect()->route('admin.dashboard');
         }
 
-        return back()->withErrors([
-            'email' => 'Invalid credentials.',
-        ]);
+        return back()->withErrors(['email' => 'Invalid credentials']);
     }
+
+    public function logout(Request $request)
+    {
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('admin.login.form');
+    }
+
 
     // Dashboard
     public function dashboard()
@@ -134,12 +137,6 @@ class AdminController extends Controller
         ));
     }
 
-    // Logout
-    public function logout()
-    {
-        Auth::guard('admin')->logout();
-        return redirect()->route('admin.login.form');
-    }
 
     public function customers()
     {

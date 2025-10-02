@@ -10,6 +10,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminReviewController;
 
 // ----------------------
 // Authenticated User Info
@@ -77,4 +78,24 @@ Route::prefix('admin')->group(function () {
     Route::post('products', [ProductController::class, 'store']);      // Create a product
     Route::put('products/{id}', [ProductController::class, 'update']); // Update a product
     Route::delete('products/{id}', [ProductController::class, 'destroy']); // Delete a product
+});
+
+// Admin Reviews API routes
+Route::prefix('admin')->group(function () {
+
+    // Get all reviews
+    Route::get('/reviews', [AdminReviewController::class, 'index']);
+
+    // Get a single review
+    Route::get('/reviews/{id}', [AdminReviewController::class, 'show']);
+
+    // Create a review
+    Route::post('/reviews', [AdminReviewController::class, 'store']);
+
+    // Update a review
+    Route::put('/reviews/{id}', [AdminReviewController::class, 'update']);
+
+    // Delete a review
+    Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy']);
+
 });

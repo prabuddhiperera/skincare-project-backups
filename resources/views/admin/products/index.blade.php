@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite('resources/css/app.css') {{-- Tailwind --}}
 </head>
 <body class="bg-gray-100">
 
@@ -19,7 +19,7 @@
                 <a href="{{ route('admin.customers') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Users</a>
                 <a href="{{ route('admin.orders') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Orders</a>
                 <a href="{{ route('admin.products.index') }}" class="block py-2 px-4 bg-gray-700 rounded">Products</a>
-                <a href="#" class="block py-2 px-4 rounded hover:bg-gray-700">Categories</a>
+                <a href="{{ route('admin.reviews.index') }}" class="block py-2 px-4 rounded hover:bg-gray-700">Reviews</a>
             </nav>
             <form method="POST" action="{{ route('admin.logout') }}" class="p-4 border-t border-gray-700">
                 @csrf
@@ -57,7 +57,7 @@
                                 <td class="px-6 py-4">{{ $product->id }}</td>
                                 <td class="px-6 py-4">{{ $product->name }}</td>
                                 <td class="px-6 py-4">{{ $product->brand }}</td>
-                                <td class="px-6 py-4">${{ $product->price }}</td>
+                                <td class="px-6 py-4">${{ number_format($product->price, 2) }}</td>
                                 <td class="px-6 py-4">{{ $product->category->name ?? '-' }}</td>
                                 <td class="px-6 py-4 flex gap-2">
                                     <a href="{{ route('admin.products.edit', $product->id) }}"

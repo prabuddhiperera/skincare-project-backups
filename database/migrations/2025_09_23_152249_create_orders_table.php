@@ -13,15 +13,18 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id'); // refers to users_id
+            $table->unsignedBigInteger('user_id'); // refers to users.id
             $table->decimal('totalamount', 10, 2);
-            $table->dateTime('orderdate');
-            $table->string('status')->default('pending');
+            $table->dateTime('orderdate')->default(now()); // auto set order time
+            $table->string('status')->default('pending'); // pending, processing, completed, cancelled
             $table->timestamps();
 
-            $table->foreign('customer_id')->references('id')->on('users')->onDelete('cascade');
-
+            $table->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
+
     }
 
     /**

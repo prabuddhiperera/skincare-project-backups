@@ -43,7 +43,7 @@
         <section class="max-w-7xl mx-auto px-6 py-12 flex-1">
             <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                 @forelse($products as $product)
-                    <a href="{{ route('product.details', $product->id) }}" 
+                    <a href="{{ asset($product->image) }}" 
                        class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4 cursor-pointer"
                          style="min-width: 320px; max-width: 400px;">
                         <img src="{{ asset('uploads/products/'.$product->image) }}" 

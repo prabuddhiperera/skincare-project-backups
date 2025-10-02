@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Élan | Shop</title>
     @vite('resources/css/app.css') {{-- Tailwind --}}
+    @livewireStyles
 </head>
 <body style="background-color: #ffe8e9;">
 
@@ -20,14 +21,39 @@
             class="w-full h-[498px] object-cover">
     </div>
 
+    <!-- Search & Filter Form -->
+    <form method="GET" action="{{ route('shop') }}" class="flex flex-wrap gap-4 justify-center mb-4 mx-auto px-6 py-6">
+
+        <!-- Search Input -->
+        <input type="text" name="search" placeholder="Search products..." 
+               value="{{ request('search') }}"
+               class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300 w-full sm:w-[500px] lg:w-[600px]">
+
+        <!-- Category Filter -->
+        <select name="category" 
+                class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-300">
+            <option value="">All Categories</option>
+            @foreach($categories as $cat)
+                <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>
+                    {{ ucfirst($cat) }}
+                </option>
+            @endforeach
+        </select>
+
+        <!-- Submit Button -->
+        <button type="submit" 
+                class="px-4 py-2 bg-[#db9289] text-white font-semibold rounded-lg hover:bg-[#c87b7c] transition">
+            Apply
+        </button>
+    </form>
+
     <!-- Product Grid -->
     <section class="max-w-7xl mx-auto px-6 py-12">
         <h2 class="text-center text-2xl mb-10" style="font-family: 'Lora', serif;">OUR PRODUCTS</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             @forelse($products as $product)
-                <div class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4 cursor-pointer"
-                     onclick="openModal({{ $product->id }})">
-                    <img src="{{ asset('uploads/products/'.$product->image) }}" 
+                <div class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4 cursor-pointer">
+                    <img src="{{ asset($product->image) }}"
                          alt="{{ $product->name }}" 
                          class="w-full h-56 object-cover rounded-xl">
 
@@ -35,6 +61,11 @@
                         <h3 class="text-lg font-semibold text-gray-800">{{ $product->name }}</h3>
                         <p class="text-pink-600 font-bold mt-1">${{ number_format($product->price, 2) }}</p>
                         <p class="text-gray-500 text-sm mt-2 line-clamp-2">{{ $product->description }}</p>
+
+                        {{-- Wishlist Button --}}
+                        @auth
+                            @livewire('wishlist-toggle', ['product' => $product], key($product->id))
+                        @endauth
                     </div>
                 </div>
 
@@ -60,6 +91,17 @@
                         {{-- Reviews --}}
                         <div class="mt-5">
                             <h4 class="font-semibold text-gray-800 mb-2">Customer Reviews</h4>
+
+                            {{-- Livewire Review Form --}}
+                            <div class="mt-2">
+                                @auth
+                                    @livewire('review-form', ['product_id' => $product->id])
+                                @else
+                                    <p class="text-sm text-gray-500">Login to add a review.</p>
+                                @endauth
+                            </div>
+
+                            {{-- Existing Reviews --}}
                             @forelse($product->reviews as $review)
                                 <div class="border-b py-2">
                                     <p class="text-sm text-gray-700 font-semibold">{{ $review->user->name ?? 'Anonymous' }}</p>
@@ -93,5 +135,7 @@
         }
     </script>
 
+    @livewireScripts
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </body>
 </html>

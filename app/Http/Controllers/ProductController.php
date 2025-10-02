@@ -105,10 +105,25 @@ class ProductController extends Controller
     
     public function shop()
     {
-        $products = Product::with('reviews')->get();
+        $query = request('search') ?? '';
+        $category = request('category') ?? '';
 
-        return view('shop', compact('products'));
+        $products = Product::query()
+            ->when($query, function($q) use ($query) {
+                $q->where('name', 'like', '%' . $query . '%');
+            })
+            ->when($category, function($q) use ($category) {
+                $q->whereHas('category', function($q2) use ($category) {
+                    $q2->where('name', $category);
+                });
+            })
+            ->get();
+
+        $categories = ['acne', 'brightening', 'moisturizer', 'makeup']; // for filter dropdown
+
+        return view('shop', compact('products', 'categories', 'query', 'category'));
     }
+
 
     public function userShop(Request $request)
     {

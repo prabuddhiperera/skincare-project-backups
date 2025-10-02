@@ -46,7 +46,7 @@
                     <a href="{{ route('product.details', ['id' => $product->id]) }}" 
                        class="bg-white rounded-2xl shadow hover:shadow-lg transition p-4 cursor-pointer"
                          style="min-width: 320px; max-width: 400px;">
-                        <img src="{{ asset('uploads/products/'.$product->image) }}" 
+                        <img src="{{ asset($product->image) }}" 
                              alt="{{ $product->name }}" 
                              class="w-full h-56 object-cover rounded-xl">
                         <div class="mt-4">

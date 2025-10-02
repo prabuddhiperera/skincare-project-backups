@@ -14,7 +14,7 @@
 
     {{-- Banner --}}
     <div class="relative w-full h-[300px]">
-        <img src="{{ asset('img/about-banner.jpeg') }}" 
+        <img src="{{ asset('img/about-banner.jpg') }}" 
              alt="About Us Banner" 
              class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">

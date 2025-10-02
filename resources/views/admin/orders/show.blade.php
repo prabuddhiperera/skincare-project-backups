@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Order</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite('resources/css/app.css') {{-- Tailwind --}}
 </head>
 <body class="bg-gray-100 p-6">
     <div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">

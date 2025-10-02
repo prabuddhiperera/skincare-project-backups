@@ -2,19 +2,90 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Review;
 use Illuminate\Http\Request;
+use App\Models\Review;
+use App\Models\User;
+use App\Models\Product;
 
 class ReviewController extends Controller
 {
     /**
-     * Display a listing of all reviews (with customer + product).
+     * Display a listing of reviews.
      */
     public function index()
     {
-        return response()->json(
-            Review::with(['customer', 'product'])->latest()->get()
-        );
+        $reviews = Review::with(['user', 'product'])->get();
+        return view('admin.reviews.index', compact('reviews'));
+    }
+
+    /**
+     * Show the form for creating a new review.
+     */
+    public function create()
+    {
+        $users = User::all();
+        $products = Product::all();
+
+        return view('admin.reviews.create', compact('users', 'products'));
+    }
+
+    /**
+     * Store a newly created review.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id'    => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
+            'rating'     => 'required|integer|min:1|max:5',
+            'comment'    => 'nullable|string',
+        ]);
+
+        Review::create($validated);
+
+        return redirect()->route('admin.reviews.index')->with('success', 'Review added successfully!');
+    }
+
+    /**
+     * Show the form for editing a review.
+     */
+    public function edit($id)
+    {
+        $review = Review::findOrFail($id);
+        $users = User::all();
+        $products = Product::all();
+
+        return view('admin.reviews.edit', compact('review', 'users', 'products'));
+    }
+
+    /**
+     * Update the specified review.
+     */
+    public function update(Request $request, $id)
+    {
+        $review = Review::findOrFail($id);
+
+        $validated = $request->validate([
+            'user_id'    => 'required|exists:users,id',
+            'product_id' => 'required|exists:products,id',
+            'rating'     => 'required|integer|min:1|max:5',
+            'comment'    => 'nullable|string',
+        ]);
+
+        $review->update($validated);
+
+        return redirect()->route('admin.reviews.index')->with('success', 'Review updated successfully!');
+    }
+
+    /**
+     * Remove the specified review.
+     */
+    public function destroy($id)
+    {
+        $review = Review::findOrFail($id);
+        $review->delete();
+
+        return redirect()->route('admin.reviews.index')->with('success', 'Review deleted successfully!');
     }
 
     /**
@@ -22,70 +93,11 @@ class ReviewController extends Controller
      */
     public function recent()
     {
-        $reviews = \App\Models\Review::with('customer', 'product')
-                    ->latest()
-                    ->take(5)
-                    ->get();
+        $reviews = Review::with(['user', 'product'])
+                        ->latest()
+                        ->take(5)
+                        ->get();
 
         return view('welcome', compact('reviews'));
     }
-
-
-
-    /**
-     * Store a newly created review in storage.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'product_id'  => 'required|exists:products,id',
-            'rating'      => 'required|integer|min:1|max:5',
-            'comment'     => 'nullable|string',
-        ]);
-
-        $review = Review::create($validated);
-
-        return response()->json($review, 201);
-    }
-
-    /**
-     * Display the specified review.
-     */
-    public function show(string $id)
-    {
-        $review = Review::with(['customer', 'product'])->findOrFail($id);
-        return response()->json($review);
-    }
-
-    /**
-     * Update the specified review.
-     */
-    public function update(Request $request, string $id)
-    {
-        $review = Review::findOrFail($id);
-
-        $validated = $request->validate([
-            'rating'  => 'sometimes|integer|min:1|max:5',
-            'comment' => 'sometimes|string',
-        ]);
-
-        $review->update($validated);
-
-        return response()->json($review);
-    }
-
-    /**
-     * Remove the specified review.
-     */
-    public function destroy(string $id)
-    {
-        Review::findOrFail($id)->delete();
-        return response()->json(null, 204);
-    }
-
-
-    
-
-
 }

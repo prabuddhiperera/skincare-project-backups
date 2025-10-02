@@ -9,6 +9,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\FavouriteController;
+//use App\Http\Controllers\MongoReviewController;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\Category;
@@ -36,6 +39,14 @@ Route::get('/component-shop', function () {
 
     return view('components.shop', compact('products'));
 })->name('component.shop');
+
+Route::get('/about', function () {
+    return view('components.about'); 
+})->name('about');
+
+Route::get('/contact', function () {
+    return view('components.contact'); 
+})->name('contact');
 
 // ----------------------
 // Categories (Before Login)
@@ -67,16 +78,13 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 // Admin Routes
 // ----------------------
 Route::prefix('admin')->group(function () {
-
-    // Admin login
     Route::middleware('guest:admin')->group(function () {
-        Route::get('/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
+        Route::get('/login', [AdminController::class, 'showLoginForm'])->name('admin.login.form');
         Route::post('/login', [AdminController::class, 'login'])->name('admin.login.submit');
     });
 
-    // Admin authenticated area
+    // Authenticated admins with double admin prefix
     Route::middleware('auth:admin')->group(function () {
-
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
@@ -101,10 +109,17 @@ Route::prefix('admin')->group(function () {
         Route::get('/products', [ProductController::class, 'index'])->name('admin.products.index');
         Route::get('products/create', [ProductController::class, 'create'])->name('admin.products.create');
         Route::post('products', [ProductController::class, 'store'])->name('admin.products.store');
-        Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
-
+        Route::get('/products/{id}/edit', [ProductController::class, 'show'])->name('admin.products.edit');
         Route::put('/products/{id}', [ProductController::class, 'update'])->name('admin.products.update');
         Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+
+        // Admin Review CRUD
+        Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');
+        Route::get('/reviews/create', [ReviewController::class, 'create'])->name('admin.reviews.create');
+        Route::post('/reviews', [ReviewController::class, 'store'])->name('admin.reviews.store');
+        Route::get('/reviews/{id}/edit', [ReviewController::class, 'edit'])->name('admin.reviews.edit');
+        Route::put('/reviews/{id}', [ReviewController::class, 'update'])->name('admin.reviews.update');
+        Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
     });
 });
 
@@ -169,6 +184,31 @@ Route::middleware(['auth'])->group(function () {
 // Cart + Checkout
 // ----------------------
 Route::middleware(['auth'])->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
     Route::post('/checkout/now/{id}', [CheckoutController::class, 'buyNow'])->name('checkout.now');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 });
+
+Route::get('/orders/track/{order}', [OrderController::class, 'track'])->name('track')->middleware('auth');
+
+
+// Show favourites
+Route::get('/favourites', [FavouriteController::class, 'index'])->name('user.favourites');
+
+// Remove favourite
+Route::delete('/favourites/{id}', [FavouriteController::class, 'destroy'])->name('user.favourites.remove');
+
+// Cart page
+Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('user.cart');
+Route::get('/search', fn() => view('search'))->name('search');
+
+
+//MongoDB
+// Route::get('/mongo-reviews', [MongoReviewController::class, 'index']);
+// Route::post('/mongo-reviews', [MongoReviewController::class, 'store']);
+// Route::put('/mongo-reviews/{id}', [MongoReviewController::class, 'update']);
+// Route::delete('/mongo-reviews/{id}', [MongoReviewController::class, 'destroy']);

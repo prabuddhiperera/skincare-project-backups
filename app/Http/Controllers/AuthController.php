@@ -59,6 +59,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/'); // redirect to home page
+        return redirect('/dashboard'); // redirect to home page
     }
 }
