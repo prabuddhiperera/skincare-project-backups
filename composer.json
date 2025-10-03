@@ -66,6 +66,7 @@
         }
     },
     "config": {
+        "ext-mongodb": "1.20.0",
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
